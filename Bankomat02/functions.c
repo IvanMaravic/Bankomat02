@@ -371,9 +371,6 @@ void* spremanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 int izlazIzPrograma(RACUN* poljeRacuna) {
 	printf("Zatvaranje programa\tDa?\tNe?\n");
 	char potvrda[3] = { '\0' };
-	for (int i=0; i < 3; i++) {
-		printf("\n%s %s %.2f\n", (poljeRacuna + i)->ime, (poljeRacuna + i)->prezime, (poljeRacuna + i)->stanje);
-	}
 	scanf("%2s", potvrda);
 	if (strcmp("da", potvrda) == 0) {
 		free(poljeRacuna);
