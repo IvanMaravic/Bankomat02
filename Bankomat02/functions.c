@@ -34,7 +34,7 @@ void kreiranjeDatoteke(const char* const ime_Datoteke) {
 	}
 	FILE* pF = fopen(ime_Datoteke, "ab+");
 	if (pF == NULL) {
-		perror("Kreiranje datoteke studenti.bin");
+		perror("Kreiranje datoteke racuni.bin");
 		exit(EXIT_FAILURE);
 	}
 	rewind(pF);
