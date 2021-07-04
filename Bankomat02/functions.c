@@ -7,21 +7,6 @@
 #include <ctype.h>
 
 
-void kreiranjeDatoteke(const char* const ime_Datoteke) {
-	int brojRacuna = 0;
-	if (ime_Datoteke != NULL) {
-		brojRacuna = ucitavanjeBrojRacuna();
-	}
-	FILE* pF = fopen(ime_Datoteke, "ab+");
-	if (pF == NULL) {
-		perror("Kreiranje datoteke studenti.bin");
-		exit(EXIT_FAILURE);
-	}
-	fwrite(&brojRacuna, sizeof(int), 1, pF);
-	fclose(pF);
-}
-
-
 int ucitavanjeBrojRacuna() {
 	int brRacuna = 0;
 	FILE* datoteka = NULL;
@@ -40,6 +25,24 @@ int ucitavanjeBrojRacuna() {
 	}
 	return brRacuna;
 }
+
+
+void kreiranjeDatoteke(const char* const ime_Datoteke) {
+	int brojRacuna = 0;
+	if (ime_Datoteke != NULL) {
+		brojRacuna = ucitavanjeBrojRacuna();
+	}
+	FILE* pF = fopen(ime_Datoteke, "ab+");
+	if (pF == NULL) {
+		perror("Kreiranje datoteke studenti.bin");
+		exit(EXIT_FAILURE);
+	}
+	fwrite(&brojRacuna, sizeof(int), 1, pF);
+	printf("Datoteka ima velicinu od %ld bajtova\n", ftell(pF));
+	fclose(pF);
+}
+
+
 
 
 RACUN* ucitavanjeRacuna(RACUN* racuni) {
@@ -119,6 +122,7 @@ void dodavanjeRacuna(const char* const ime_Datoteke, RACUN* const poljeRacuna) {
 
 RACUN* ucitajRacun(const char* const ime_Datoteke) {
 	int brojRacuna;
+	RACUN* poljeRacuna;
 	brojRacuna = ucitavanjeBrojRacuna();
 	FILE* pF = fopen(ime_Datoteke, "rb");
 	if (pF == NULL) {
@@ -127,12 +131,14 @@ RACUN* ucitajRacun(const char* const ime_Datoteke) {
 		//exit(EXIT_FAILURE);
 	}
 	printf("brojRacuna: %d\n", brojRacuna);
-	RACUN* poljeRacuna = (RACUN*)calloc(1, sizeof(RACUN));
+	poljeRacuna = (RACUN*)calloc(brojRacuna, sizeof(RACUN));
 	if (poljeRacuna == NULL) {
 		perror("Zauzimanje memorije za racune");
 		return NULL;
 		//exit(EXIT_FAILURE);
 	}
+	rewind(pF);
+	fseek(pF, 4, SEEK_SET);
 	fread(poljeRacuna, sizeof(RACUN), brojRacuna, pF);
 	return poljeRacuna;
 }
@@ -338,6 +344,10 @@ void* spremanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 				printf("Iznos mora biti djeljiv s 50.");
 			}
 			else {
+				printf("%d", brojRacuna);
+				for (i = 0; i < brojRacuna; i++) {
+					printf("%s %s %.2f", (poljeRacuna + i)->ime, (poljeRacuna + i)->prezime, (poljeRacuna + i)->stanje);
+				}
 				(poljeRacuna + i)->stanje += (float)nekiIznos;
 				printf("Novac je spremljen na vas racun.\n");
 				FILE* pF = fopen(ime_Datoteke, "rb+");
@@ -366,11 +376,13 @@ void* spremanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 int izlazIzPrograma(RACUN* poljeRacuna) {
 	printf("Zatvaranje programa\tDa?\tNe?\n");
 	char potvrda[3] = { '\0' };
-	scanf("%2s", potvrda);
-	if (strcmp("da", tolower(potvrda))) {
-		return 1;
-		free(poljeRacuna);
-
+	for (int i=0; i < 3; i++) {
+		printf("\n%s %s %.2f\n", (poljeRacuna + i)->ime, (poljeRacuna + i)->prezime, (poljeRacuna + i)->stanje);
 	}
-	return 0;
+	scanf("%2s", potvrda);
+	if (strcmp("da", potvrda) == 0) {
+		free(poljeRacuna);
+		return 0;
+	}
+	return 10;
 }
