@@ -335,23 +335,17 @@ void* spremanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 	int i;
 	int nekiIznos;
 	int trazeniPin;
-	RACUN* temp = poljeRacuna;
 	printf("Unesite PIN.\n");
 	scanf("%d", &trazeniPin);
-	for (i = 0; i < brojRacuna; i++)
-	{
-		if (trazeniPin == (poljeRacuna + i)->pin) {
-			printf("Unesite iznos novca koji zelite spremiti:");
+	for (i = 0; i < brojRacuna; i++) {
+		if (trazeniPin == (poljeRacuna + i)->pin){
+			printf("Unesite iznos koji zelite staviti:");
 			scanf("%d", &nekiIznos);
-			if (nekiIznos % 50 != 0) {
-				printf("Iznos mora biti djeljiv s 50.");
+			if ((nekiIznos % 50 != 0) || (nekiIznos<0)) {
+				printf("Iznos mora biti djeljiv sa 50\n");
 				return NULL;
 			}
 			else {
-				printf("%d", brojRacuna);
-				for (i = 0; i < brojRacuna; i++) {
-					printf("%s %s %.2f", (poljeRacuna + i)->ime, (poljeRacuna + i)->prezime, (poljeRacuna + i)->stanje);
-				}
 				(poljeRacuna + i)->stanje += nekiIznos;
 				printf("Transakcija izvedena.\n");
 				FILE* pF = fopen(ime_Datoteke, "rb+");
@@ -364,13 +358,10 @@ void* spremanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 				fseek(pF, sizeof(RACUN) * i, SEEK_CUR);
 				fwrite((poljeRacuna + i), sizeof(RACUN), 1, pF);
 				fclose(pF);
-				return NULL;
 			}
-
 		}
-
+		
 	}
-	printf("Pogresan PIN");
 	return NULL;
 }
 
