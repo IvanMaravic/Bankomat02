@@ -37,6 +37,7 @@ void kreiranjeDatoteke(const char* const ime_Datoteke) {
 		perror("Kreiranje datoteke studenti.bin");
 		exit(EXIT_FAILURE);
 	}
+	rewind(pF);
 	fwrite(&brojRacuna, sizeof(int), 1, pF);
 	printf("Datoteka ima velicinu od %ld bajtova\n", ftell(pF));
 	fclose(pF);
@@ -196,8 +197,8 @@ void* podizanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 					exit(EXIT_FAILURE);
 				}
 				rewind(pF);
-				fseek(pF, 4, SEEK_SET);
-				fseek(pF, sizeof(RACUN) * (i - 1), SEEK_SET);
+				fseek(pF, 4, SEEK_CUR);
+				fseek(pF, sizeof(RACUN) * i, SEEK_CUR);
 				fwrite((poljeRacuna + i), sizeof(RACUN), 1, pF);
 				fclose(pF);
 			}
@@ -214,8 +215,8 @@ void* podizanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 					exit(EXIT_FAILURE);
 				}
 				rewind(pF);
-				fseek(pF, 4, SEEK_SET);
-				fseek(pF, sizeof(RACUN) * (i - 1), SEEK_SET);
+				fseek(pF, 4, SEEK_CUR);
+				fseek(pF, sizeof(RACUN) * i, SEEK_CUR);
 				fwrite((poljeRacuna + i), sizeof(RACUN), 1, pF);
 				fclose(pF);
 			}
@@ -232,8 +233,8 @@ void* podizanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 					exit(EXIT_FAILURE);
 				}
 				rewind(pF);
-				fseek(pF, 4, SEEK_SET);
-				fseek(pF, sizeof(RACUN) * (i - 1), SEEK_SET);
+				fseek(pF, 4, SEEK_CUR);
+				fseek(pF, sizeof(RACUN) * i, SEEK_CUR);
 				fwrite((poljeRacuna + i), sizeof(RACUN), 1, pF);
 				fclose(pF);
 			}
@@ -250,8 +251,8 @@ void* podizanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 					exit(EXIT_FAILURE);
 				}
 				rewind(pF);
-				fseek(pF, 4, SEEK_SET);
-				fseek(pF, sizeof(RACUN) * (i - 1), SEEK_SET);
+				fseek(pF, 4, SEEK_CUR);
+				fseek(pF, sizeof(RACUN) * i, SEEK_CUR);
 				fwrite((poljeRacuna + i), sizeof(RACUN), 1, pF);
 				fclose(pF);
 			}
@@ -268,8 +269,8 @@ void* podizanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 					exit(EXIT_FAILURE);
 				}
 				rewind(pF);
-				fseek(pF, 4, SEEK_SET);
-				fseek(pF, sizeof(RACUN) * (i - 1), SEEK_SET);
+				fseek(pF, 4, SEEK_CUR);
+				fseek(pF, sizeof(RACUN) * i, SEEK_CUR);
 				fwrite((poljeRacuna + i), sizeof(RACUN), 1, pF);
 				fclose(pF);
 			}
@@ -286,8 +287,8 @@ void* podizanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 					exit(EXIT_FAILURE);
 				}
 				rewind(pF);
-				fseek(pF, 4, SEEK_SET);
-				fseek(pF, sizeof(RACUN) * (i - 1), SEEK_SET);
+				fseek(pF, 4, SEEK_CUR);
+				fseek(pF, sizeof(RACUN)* i, SEEK_CUR);
 				fwrite((poljeRacuna + i), sizeof(RACUN), 1, pF);
 				fclose(pF);
 			}
@@ -312,8 +313,8 @@ void* podizanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 					exit(EXIT_FAILURE);
 				}
 				rewind(pF);
-				fseek(pF, 4, SEEK_SET);
-				fseek(pF, sizeof(RACUN) * (i - 1), SEEK_SET);
+				fseek(pF, 4, SEEK_CUR);
+				fseek(pF, sizeof(RACUN)* i, SEEK_CUR);
 				fwrite((poljeRacuna + i), sizeof(RACUN), 1, pF);
 				fclose(pF);
 
@@ -322,6 +323,7 @@ void* podizanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 	}
 	return NULL;
 }
+
 
 void* spremanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 	int brojRacuna;
@@ -333,6 +335,7 @@ void* spremanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 	int i;
 	int nekiIznos;
 	int trazeniPin;
+	RACUN* temp = poljeRacuna;
 	printf("Unesite PIN.\n");
 	scanf("%d", &trazeniPin);
 	for (i = 0; i < brojRacuna; i++)
@@ -342,22 +345,23 @@ void* spremanjeNovca(RACUN* const poljeRacuna, const char* ime_Datoteke) {
 			scanf("%d", &nekiIznos);
 			if (nekiIznos % 50 != 0) {
 				printf("Iznos mora biti djeljiv s 50.");
+				return NULL;
 			}
 			else {
 				printf("%d", brojRacuna);
 				for (i = 0; i < brojRacuna; i++) {
 					printf("%s %s %.2f", (poljeRacuna + i)->ime, (poljeRacuna + i)->prezime, (poljeRacuna + i)->stanje);
 				}
-				(poljeRacuna + i)->stanje += (float)nekiIznos;
-				printf("Novac je spremljen na vas racun.\n");
+				(poljeRacuna + i)->stanje += nekiIznos;
+				printf("Transakcija izvedena.\n");
 				FILE* pF = fopen(ime_Datoteke, "rb+");
 				if (pF == NULL) {
-					perror("Podizanje novca u datoteke racuni.bin");
+					perror("Dodavanje racuna u datoteke racuni.bin");
 					exit(EXIT_FAILURE);
 				}
 				rewind(pF);
-				fseek(pF, 4, SEEK_SET);
-				fseek(pF, sizeof(RACUN) * (i - 1), SEEK_SET);
+				fseek(pF, 4, SEEK_CUR);
+				fseek(pF, sizeof(RACUN) * i, SEEK_CUR);
 				fwrite((poljeRacuna + i), sizeof(RACUN), 1, pF);
 				fclose(pF);
 				return NULL;
